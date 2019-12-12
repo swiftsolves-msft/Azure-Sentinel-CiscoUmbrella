@@ -1,0 +1,1 @@
+// Need to rewrite v1 of cisco umbrella logs does not contain computername making the dns request >> Source: https://github.com/Azure/Azure-Sentinel/blob/2620271438009d13ea76d9640804fd86046583f7/Hunting%20Queries/DnsEvents/DNS_LongURILookup.yaml

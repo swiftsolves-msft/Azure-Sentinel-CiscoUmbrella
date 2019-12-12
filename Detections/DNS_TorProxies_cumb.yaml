@@ -1,5 +1,5 @@
 id: a83ef0f4-dace-4767-bce3-ebd32599d2a0
-Domain_s: DNS tor proxies
+name: DNS tor proxies
 description: |
   'Identifies IPs performing DNS lookups associated with common Tor proxies.'
 severity: Low
