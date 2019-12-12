@@ -1,0 +1,55 @@
+id: a83ef0f4-dace-4767-bce3-ebd32599d2a0
+Domain_s: DNS tor proxies
+description: |
+  'Identifies IPs performing DNS lookups associated with common Tor proxies.'
+severity: Low
+requiredDataConnectors:
+  - connectorId: logstash
+    dataTypes:
+      - ciscoumdns_CL
+queryFrequency: 1d
+queryPeriod: 1d
+triggerOperator: gt
+triggerThreshold: 0
+tactics:
+  - Exfiltration
+relevantTechniques:
+  - T1048
+query: |
+
+  ciscoumdns_CL
+  | where TimeGenerated > ago(1d)
+  | where Domain_s contains "."
+  | where Domain_s contains "tor2web.org"
+  or Domain_s contains "tor2web.com"
+  or Domain_s contains "torlink.co"
+  or Domain_s contains "onion.to"
+  or Domain_s contains "onion.ink"
+  or Domain_s contains "onion.cab"
+  or Domain_s contains "onion.nu"
+  or Domain_s contains "onion.link"
+  or Domain_s contains "onion.it"
+  or Domain_s contains "onion.city"
+  or Domain_s contains "onion.direct"
+  or Domain_s contains "onion.top"
+  or Domain_s contains "onion.casa"
+  or Domain_s contains "onion.plus"
+  or Domain_s contains "onion.rip"
+  or Domain_s contains "onion.dog"
+  or Domain_s contains "tor2web.fi"
+  or Domain_s contains "tor2web.blutmagie.de"
+  or Domain_s contains "onion.sh"
+  or Domain_s contains "onion.lu"
+  or Domain_s contains "onion.pet"
+  or Domain_s contains "t2w.pw"
+  or Domain_s contains "tor2web.ae.org"
+  or Domain_s contains "tor2web.io"
+  or Domain_s contains "tor2web.xyz"
+  or Domain_s contains "onion.lt"
+  or Domain_s contains "s1.tor-gateways.de"
+  or Domain_s contains "s2.tor-gateways.de"
+  or Domain_s contains "s3.tor-gateways.de"
+  or Domain_s contains "s4.tor-gateways.de"
+  or Domain_s contains "s5.tor-gateways.de"
+  or Domain_s contains "hiddenservice.net"
+  | extend timestamp = TimeGenerated, IPCustomEntity = InternalIp_s, //, HostCustomEntity = Computer // does not seem to be computer in cisco umbrella dns

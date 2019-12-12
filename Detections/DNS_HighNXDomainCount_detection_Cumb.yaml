@@ -1,0 +1,44 @@
+id: a0907abe-6925-4d90-af2b-c7e89dc201a6
+Domain_s: Rare high NXDomain count
+description: |
+  'Identifies clients with a high NXDomain count which could be indicative of a DGA (cycling through possible C2 domains
+  where most C2s are not live). Alert is generated when a new IP is seen (based on not being seen associated with 
+  NXDomain records in prior 10-day baseline period).'
+severity: Medium
+requiredDataConnectors:
+  - connectorId: logstash
+    dataTypes:
+      - ciscoumdns_CL
+queryFrequency: 1d
+queryPeriod: 10d
+triggerOperator: gt
+triggerThreshold: 0
+tactics:
+  - CommandAndControl
+relevantTechniques:
+  - T1483
+  - T1008
+query: |
+
+  let nxDomainciscoumdns_CL = ciscoumdns_CL 
+  //| where ResultCode == "3"   // QueryType_s contains ResultCode
+  | where QueryType_s contains "3" // Modified from orginal above
+  | where QueryType_s in ("A", "AAAA") // Need to investigate and possibly parse differntly in query, la, or logstash
+  | where InternalIp_s != "127.0.0.1"
+  | where Domain_s !contains "/"
+  | where Domain_s contains ".";
+  nxDomainciscoumdns_CL
+  | where TimeGenerated > ago(1d) // slight discrepancies between TimeGenerated and _timestamd_t and Timestamp_s
+  | extend sld = tostring(split(Domain_s, ".")[-2])
+  | summarize StartTimeUtc = min(TimeGenerated), EndTimeUtc = max(TimeGenerated), dcount(sld) by InternalIp_s
+  | where dcount_sld > 100
+  // Filter out previously seen IPs
+  | join kind=leftanti (nxDomainciscoumdns_CL
+      | where TimeGenerated between(ago(10d)..ago(1d))
+      | extend sld = tostring(split(Domain_s, ".")[-2])
+      | summarize dcount(sld) by InternalIp_s
+      | where dcount_sld > 100 ) on InternalIp_s
+  // Pull out sample NXDomain responses for those remaining potentially infected IPs
+  | join kind = inner (nxDomainciscoumdns_CL | summarize by Domain_s, InternalIp_s) on InternalIp_s
+  | summarize StartTimeUtc = min(StartTimeUtc), EndTimeUtc = max(EndTimeUtc), sampleNXDomainList=make_list(Domain_s, 100)  by InternalIp_s, dcount_sld
+  | extend timestamp = StartTimeUtc, IPCustomEntity = InternalIp_s

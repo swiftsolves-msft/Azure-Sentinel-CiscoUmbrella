@@ -1,0 +1,35 @@
+id: 15ae38a2-2e29-48f7-883f-863fb25a5a06
+Domain_s: Rare high reverse DNS count
+description: |
+  'Identifies clients with a high reverse DNS counts which could be carrying out scanning activity.
+  Alert is generated if the IP performing such reverse DNS lookups was not seen doing so
+  in the preceding 7-day period.'
+severity: Medium
+requiredDataConnectors:
+  - connectorId: logstash
+    dataTypes:
+      - ciscoumdns_CL
+queryFrequency: 1d
+queryPeriod: 8d
+triggerOperator: gt
+triggerThreshold: 0
+tactics:
+  - Discovery
+relevantTechniques:
+  - T1046
+query: |
+
+  ciscoumdns_CL 
+  | where TimeGenerated > ago(1d)
+  | where Domain_s contains "in-addr.arpa" 
+  | summarize StartTimeUtc = min(TimeGenerated), EndTimeUtc = max(TimeGenerated), dcount(Domain_s) by InternalIp_s
+  | where dcount_Domain_s >10
+  | project StartTimeUtc, EndTimeUtc, InternalIp_s , dcount_Domain_s 
+  | join kind=leftanti (ciscoumdns_CL 
+      | where TimeGenerated between(ago(8d)..ago(1d))
+      | where Domain_s contains "in-addr.arpa" 
+      | summarize dcount(Domain_s) by InternalIp_s, bin(TimeGenerated, 1d)
+      | where dcount_Domain_s >10
+      | project InternalIp_s , dcount_Domain_s 
+  ) on InternalIp_s
+  | extend timestamp = StartTimeUtc, IPCustomEntity = InternalIp_s

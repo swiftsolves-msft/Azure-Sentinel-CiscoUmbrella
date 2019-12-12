@@ -1,0 +1,98 @@
+id: 0d76e9cf-788d-4a69-ac7d-f234826b5bed
+Domain_s: DNS events related to mining pools
+description: |
+  'Identifies IPs that may be performing DNS lookups associated with common currency mining pools.'
+severity: Low
+requiredDataConnectors:
+  - connectorId: logstash
+    dataTypes:
+      - ciscoumdns_CL 
+queryFrequency: 1d
+queryPeriod: 1d
+triggerOperator: gt
+triggerThreshold: 0
+tactics:
+  - Execution
+  - Impact
+relevantTechniques:
+  - T1035
+  - T1496
+query: |
+
+  ciscoumdns_CL 
+  | where TimeGenerated > ago(1d)
+  | where Domain_s contains "."
+  | where Domain_s contains "monerohash.com"
+  or Domain_s contains "do-dear.com"
+  or Domain_s contains "xmrminerpro.com"
+  or Domain_s contains "secumine.net"
+  or Domain_s contains "xmrpool.com"
+  or Domain_s contains "minexmr.org"
+  or Domain_s contains "hashanywhere.com"
+  or Domain_s contains "xmrget.com"
+  or Domain_s contains "mininglottery.eu"
+  or Domain_s contains "minergate.com"
+  or Domain_s contains "moriaxmr.com"
+  or Domain_s contains "multipooler.com"
+  or Domain_s contains "moneropools.com"
+  or Domain_s contains "xmrpool.eu"
+  or Domain_s contains "coolmining.club"
+  or Domain_s contains "supportxmr.com"
+  or Domain_s contains "minexmr.com"
+  or Domain_s contains "hashvault.pro"
+  or Domain_s contains "xmrpool.net"
+  or Domain_s contains "crypto-pool.fr"
+  or Domain_s contains "xmr.pt"
+  or Domain_s contains "miner.rocks"
+  or Domain_s contains "walpool.com"
+  or Domain_s contains "herominers.com"
+  or Domain_s contains "gntl.co.uk"
+  or Domain_s contains "semipool.com"
+  or Domain_s contains "coinfoundry.org"
+  or Domain_s contains "cryptoknight.cc"
+  or Domain_s contains "fairhash.org"
+  or Domain_s contains "baikalmine.com"
+  or Domain_s contains "tubepool.xyz"
+  or Domain_s contains "fairpool.xyz"
+  or Domain_s contains "asiapool.io"
+  or Domain_s contains "coinpoolit.webhop.me"
+  or Domain_s contains "nanopool.org"
+  or Domain_s contains "moneropool.com"
+  or Domain_s contains "miner.center"
+  or Domain_s contains "prohash.net"
+  or Domain_s contains "poolto.be"
+  or Domain_s contains "cryptoescrow.eu"
+  or Domain_s contains "monerominers.net"
+  or Domain_s contains "cryptonotepool.org"
+  or Domain_s contains "extrmepool.org"
+  or Domain_s contains "webcoin.me"
+  or Domain_s contains "kippo.eu"
+  or Domain_s contains "hashinvest.ws"
+  or Domain_s contains "monero.farm"
+  or Domain_s contains "supportxmr.com"
+  or Domain_s contains "xmrpool.eu"
+  or Domain_s contains "linux-repository-updates.com"
+  or Domain_s contains "1gh.com"
+  or Domain_s contains "dwarfpool.com"
+  or Domain_s contains "hash-to-coins.com"
+  or Domain_s contains "hashvault.pro"
+  or Domain_s contains "pool-proxy.com"
+  or Domain_s contains "hashfor.cash"
+  or Domain_s contains "fairpool.cloud"
+  or Domain_s contains "litecoinpool.org"
+  or Domain_s contains "mineshaft.ml"
+  or Domain_s contains "abcxyz.stream"
+  or Domain_s contains "moneropool.ru"
+  or Domain_s contains "cryptonotepool.org.uk"
+  or Domain_s contains "extremepool.org"
+  or Domain_s contains "extremehash.com"
+  or Domain_s contains "hashinvest.net"
+  or Domain_s contains "unipool.pro"
+  or Domain_s contains "crypto-pools.org"
+  or Domain_s contains "monero.net"
+  or Domain_s contains "backup-pool.com"
+  or Domain_s contains "mooo.com"
+  or Domain_s contains "freeyy.me"
+  or Domain_s contains "cryptonight.net"
+  or Domain_s contains "shscrypto.net"
+  | extend timestamp = TimeGenerated, IPCustomEntity = InternalIp_s //, HostCustomEntity = Computer // does not seem to be computer in cisco umbrella dns
