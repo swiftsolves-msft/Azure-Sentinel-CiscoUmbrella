@@ -368,7 +368,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "ciscoumdns_CL\r\n//| where Action_s contains \"Blocked\"\r\n| where TimeGenerated{TimeRange:value}\r\n| project Most_Granular_Identity_s, Domain_s, Action_s, InternalIp_s, Categories_s",
+        "query": "ciscoumdns_CL\r\n| where Action_s contains \"Blocked\"\r\n| where TimeGenerated{TimeRange:value}\r\n| project Most_Granular_Identity_s, Domain_s, Action_s, InternalIp_s, Categories_s",
         "size": 0,
         "title": "Active Users",
         "timeContext": {
