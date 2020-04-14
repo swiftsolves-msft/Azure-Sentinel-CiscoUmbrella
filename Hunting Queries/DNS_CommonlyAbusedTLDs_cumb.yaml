@@ -23,7 +23,8 @@ query: |
   ciscoumdns_CL
   | where TimeGenerated >= ago(timeframe) 
   | where Domain_s has "." 
-  | extend tld = tostring(split(Domain_s, ".")[-1])
+  | extend tld_strip = trim_end(@"(.)",Domain_s) // removing trailing '.' from Domain_s
+  | extend tld = tostring(split(tld_strip, ".")[-1]) // Finding TLD
   | where tld in~ (abusedTLD)
   | summarize StartTimeUtc = min(TimeGenerated), EndTimeUtc = max(TimeGenerated), Domain_sCount = count() by Domain_s, InternalIp_s, tld
   | order by Domain_sCount desc
